@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>우리 반 음악 퀴즈 출제하기</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0a0e1a 80%);
+      color: #ffffff;
+      min-height: 100vh;
+      line-height: 1.6;
+      letter-spacing: -0.3px;
+      padding-bottom: 3rem;
+    }
+    header {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #334155;
+      padding: 0.85rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .logo-icon {
+      font-size: 1.4rem;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      padding: 0.25rem 0.5rem;
+      border-radius: 8px;
+    }
+    .logo-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 40%, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .mobile-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .card {
+      background: #141b2d;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-bottom: 1.1rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .connection-banner {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #6ee7b7;
+      padding: 0.65rem 0.9rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .network-warning {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      padding: 0.65rem 0.9rem;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+      display: none;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #cbd5e1;
+    }
+    .form-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: rgba(15, 23, 42, 0.7);
+      color: #fff;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.95rem;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+    .btn-secondary {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+    }
+    .btn-add-song {
+      background: rgba(99, 102, 241, 0.12);
+      border: 2px dashed rgba(99, 102, 241, 0.6);
+      color: #c7d2fe;
+      padding: 0.85rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .song-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .song-pill {
+      background: #6366f1;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+    }
+    .btn-remove {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .search-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 0.5rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .search-item.selected {
+      border-color: #6366f1;
+      background: rgba(99, 102, 241, 0.2);
+    }
+    .search-item img {
+      width: 58px;
+      height: 44px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+    .search-info { flex: 1; min-width: 0; }
+    .search-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .search-channel { font-size: 0.75rem; color: #94a3b8; }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-box">
+      <div class="logo-icon">🎧</div>
+      <h1 class="logo-title">우리 반 음악 퀴즈</h1>
+    </div>
+  </header>
+
+  <main class="mobile-container">
+    <!-- 연결 상태 알림 배너 -->
+    <div id="connBanner" class="connection-banner">
+      <div style="display: flex; align-items: center; gap: 0.4rem;">
+        <span class="pulse-dot"></span>
+        <span id="connStatusText">방 연결 완료: <strong id="lblRoomCodeText">확인 중</strong></span>
+      </div>
+      <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">LTE 데이터</span>
+    </div>
+
+    <!-- 학교 Wi-Fi 감지 경고 배너 -->
+    <div id="wifiWarning" class="network-warning">
+      ⚠️ <strong>접속 주의</strong>: 학교 Wi-Fi가 켜져 있으면 출제가 실패할 수 있습니다. <strong>[Wi-Fi를 끄고 스마트폰 모바일 데이터(LTE/5G)]</strong>로 접속해주세요!
+    </div>
+
+    <!-- 노래 출제 메인 폼 (한 화면에서 바로 입력!) -->
+    <div id="sectionSubmit">
+      <!-- 학생 본인 이름/번호 입력 카드 -->
+      <div class="card" style="border-color: #6366f1;">
+        <div class="form-group" style="margin-bottom: 0.5rem;">
+          <label class="form-label" style="color: #a5b4fc; font-size: 1rem;">
+            👤 내 이름 또는 번호 <span style="color: #f43f5e;">*</span>
+          </label>
+          <input type="text" id="inputStudentName" class="form-input" placeholder="예: 15번 김철수" maxlength="20" style="font-size: 1.1rem; font-weight: 700; border-color: #6366f1; background: rgba(30, 27, 75, 0.5);">
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; color: #94a3b8; margin-top: 0.4rem;">
+          <span>방 코드: <strong id="lblRoomCode" style="color: #38bdf8;">자동 설정</strong></span>
+          <span style="color: #6ee7b7;">⚡ 1명당 2곡 출제 추천</span>
+        </div>
+      </div>
+
+      <!-- 노래 카드 목록 컨테이너 -->
+      <div id="songCardsContainer"></div>
+
+      <!-- 노래 추가 버튼 -->
+      <button type="button" class="btn-add-song" onclick="addSongCard()">
+        ➕ 문제(노래) 1곡 더 추가하기
+      </button>
+
+      <!-- 최종 출제 버튼 -->
+      <button id="btnSubmitSongs" class="btn btn-success" onclick="submitSongs()" style="font-size: 1.15rem; padding: 1.05rem;">
+        🚀 작성한 노래 모두 출제하기!
+      </button>
+
+      <p style="text-align: center; color: #94a3b8; font-size: 0.82rem; margin-top: 0.8rem; line-height: 1.4;">
+        💡 영상 검색을 하지 않아도 <strong>[제목]</strong>과 <strong>[가수]</strong>만 적고 출제하면 교탁 PC에서 자동 재생됩니다!
+      </p>
+    </div>
+
+    <!-- 출제 완료 대기 화면 -->
+    <div id="sectionWaiting" style="display: none;">
+      <div class="card" style="text-align: center; padding: 2rem 1.25rem;">
+        <div style="font-size: 3.2rem; margin-bottom: 0.6rem;">🎉</div>
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">출제 완료!</h2>
+        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 1.25rem;">
+          <strong id="displayStudentName" style="color: #38bdf8;"></strong> 학생의 노래가 등록되었습니다.<br>
+          선생님이 퀴즈를 시작할 때까지 앞쪽 스크린을 봐주세요!
+        </p>
+
+        <div style="text-align: left; margin-bottom: 1.5rem;">
+          <div style="font-weight: 700; color: #a5b4fc; margin-bottom: 0.6rem; font-size: 0.95rem;">내가 출제한 노래:</div>
+          <div id="mySubmittedSongsList" style="display: flex; flex-direction: column; gap: 0.6rem;"></div>
+        </div>
+
+        <button class="btn btn-primary" onclick="editSongs()">
+          ➕ 노래 더 추가하기 / 수정하기
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    var API_BASE = 'https://jlviguxkiswpnzteqfcu.supabase.co/functions/v1/quiz';
+
+    var currentRoomCode = '';
+    var currentStudentName = '';
+    var nextCardId = 3;
+    var songCards = [
+      { id: 1, title: '', artist: '', video: null },
+      { id: 2, title: '', artist: '', video: null }
+    ];
+
+    window.addEventListener('DOMContentLoaded', function() {
+      var p = new URLSearchParams(window.location.search).get('room');
+      if (p) currentRoomCode = p.trim().toUpperCase();
+
+      if (currentRoomCode) {
+        document.getElementById('lblRoomCode').textContent = currentRoomCode;
+        document.getElementById('lblRoomCodeText').textContent = currentRoomCode;
+      }
+      renderSongCards();
+      startHeartbeat();
+    });
+
+    var lastKnownStatus = 'active';
+    function startHeartbeat() {
+      setInterval(async function() {
+        if (!currentRoomCode) return;
+        try {
+          var res = await fetch(API_BASE + '/api/room?code=' + encodeURIComponent(currentRoomCode));
+          var data = await res.json();
+          if (data && data.room) {
+            document.getElementById('connBanner').style.display = 'flex';
+            document.getElementById('wifiWarning').style.display = 'none';
+
+            if (data.room.status === 'reset' && lastKnownStatus !== 'reset') {
+              lastKnownStatus = 'reset';
+              alert('선생님이 방을 초기화하여 새 게임이 시작되었습니다! 새로운 문제를 출제해주세요.');
+              songCards = [
+                { id: 1, title: '', artist: '', video: null },
+                { id: 2, title: '', artist: '', video: null }
+              ];
+              nextCardId = 3;
+              document.getElementById('sectionWaiting').style.display = 'none';
+              document.getElementById('sectionSubmit').style.display = 'block';
+              renderSongCards();
+            } else if (data.room.status === 'active') {
+              lastKnownStatus = 'active';
+            }
+          }
+        } catch (e) {
+          document.getElementById('wifiWarning').style.display = 'block';
+        }
+      }, 2500);
+    }
+
+    function renderSongCards() {
+      var container = document.getElementById('songCardsContainer');
+      container.innerHTML = songCards.map(function(item, idx) {
+        var isSingle = songCards.length === 1;
+        var html = '<div class="card" id="card_' + item.id + '">';
+        html += '<div class="song-card-header">';
+        html += '<span class="song-pill">🎵 ' + (idx + 1) + '번 문제</span>';
+        if (!isSingle) {
+          html += '<button type="button" class="btn-remove" onclick="removeSongCard(' + item.id + ')">✕ 삭제</button>';
+        }
+        html += '</div>';
+
+        html += '<div class="form-group">';
+        html += '<label class="form-label">노래 제목</label>';
+        html += '<input type="text" class="form-input" value="' + escapeHtml(item.title) + '" placeholder="예: 밤편지" oninput="updateSongData(' + item.id + ', \'title\', this.value)">';
+        html += '</div>';
+
+        html += '<div class="form-group">';
+        html += '<label class="form-label">가수 이름</label>';
+        html += '<input type="text" class="form-input" value="' + escapeHtml(item.artist) + '" placeholder="예: 아이유" oninput="updateSongData(' + item.id + ', \'artist\', this.value)">';
+        html += '</div>';
+
+        html += '<button type="button" class="btn btn-secondary" onclick="searchYoutube(' + item.id + ')" style="font-size: 0.9rem; padding: 0.65rem;">';
+        html += '🔍 유튜브 영상 찾기 / 변경';
+        html += '</button>';
+
+        html += '<div id="preview_' + item.id + '">';
+        if (item.video) {
+          html += renderSelectedVideo(item.video);
+        }
+        html += '</div>';
+
+        html += '</div>';
+        return html;
+      }).join('');
+    }
+
+    function renderSelectedVideo(video) {
+      return '<div class="search-item selected">' +
+        (video.thumbnail ? '<img src="' + video.thumbnail + '" alt="썸네일">' : '') +
+        '<div class="search-info">' +
+          '<div class="search-title">' + escapeHtml(video.title) + '</div>' +
+          '<div class="search-channel">' + escapeHtml(video.artist) + (video.duration ? ' (' + video.duration + ')' : '') + '</div>' +
+        '</div>' +
+        '<span style="color: #10b981; font-size: 1.2rem; padding-right: 0.5rem;">✔</span>' +
+      '</div>';
+    }
+
+    function addSongCard() {
+      songCards.push({ id: nextCardId++, title: '', artist: '', video: null });
+      renderSongCards();
+    }
+
+    function removeSongCard(id) {
+      if (songCards.length <= 1) return;
+      songCards = songCards.filter(function(c) { return c.id !== id; });
+      renderSongCards();
+    }
+
+    function updateSongData(id, field, value) {
+      var card = songCards.find(function(c) { return c.id === id; });
+      if (card) {
+        card[field] = value;
+      }
+    }
+
+    async function searchYoutube(id) {
+      var card = songCards.find(function(c) { return c.id === id; });
+      if (!card) return;
+      var q = (card.artist + ' ' + card.title).trim();
+      if (!q) {
+        alert('노래 제목 또는 가수 이름을 먼저 입력해주세요!');
+        return;
+      }
+
+      var box = document.getElementById('preview_' + id);
+      box.innerHTML = '<p style="color: #a5b4fc; font-size: 0.85rem; padding: 0.5rem;">🔍 영상 찾는 중...</p>';
+
+      try {
+        var res = await fetch(API_BASE + '/api/search?q=' + encodeURIComponent(q));
+        var data = await res.json();
+        if (data.success && data.items && data.items.length > 0) {
+          box.innerHTML = '<div style="font-size: 0.8rem; color: #a5b4fc; font-weight: 700; margin-top: 0.5rem;">원하는 영상을 골라주세요:</div>';
+          data.items.slice(0, 3).forEach(function(item, idx) {
+            var el = document.createElement('div');
+            el.className = 'search-item ' + (idx === 0 ? 'selected' : '');
+            el.innerHTML = (item.thumbnail ? '<img src="' + item.thumbnail + '" alt="썸네일">' : '') +
+              '<div class="search-info">' +
+                '<div class="search-title">' + escapeHtml(item.title) + '</div>' +
+                '<div class="search-channel">' + escapeHtml(item.artist) + (item.duration ? ' (' + item.duration + ')' : '') + '</div>' +
+              '</div>' +
+              '<span class="badge-check">' + (idx === 0 ? '✔' : '') + '</span>';
+            el.onclick = function() {
+              box.querySelectorAll('.search-item').forEach(function(e) {
+                e.classList.remove('selected');
+                e.querySelector('.badge-check').textContent = '';
+              });
+              el.classList.add('selected');
+              el.querySelector('.badge-check').textContent = '✔';
+              card.video = item;
+            };
+            box.appendChild(el);
+          });
+          card.video = data.items[0];
+        } else {
+          box.innerHTML = '<div style="color: #6ee7b7; font-size: 0.82rem; padding: 0.4rem; background: rgba(16,185,129,0.12); border-radius: 8px; margin-top: 0.4rem;">💡 영상을 고르지 않아도 제목과 가수만 적고 출제하면 교탁 PC에서 자동 재생됩니다!</div>';
+        }
+      } catch (e) {
+        box.innerHTML = '<div style="color: #6ee7b7; font-size: 0.82rem; padding: 0.4rem; background: rgba(16,185,129,0.12); border-radius: 8px; margin-top: 0.4rem;">💡 영상을 고르지 않아도 제목과 가수만 적고 출제하면 교탁 PC에서 자동 재생됩니다!</div>';
+      }
+    }
+
+    async function submitSongs() {
+      var nameInput = document.getElementById('inputStudentName');
+      var studentName = (nameInput.value || '').trim();
+
+      if (!studentName) {
+        alert('이름 또는 번호를 입력해주세요! (예: 15번 김철수)');
+        nameInput.focus();
+        nameInput.style.borderColor = '#f43f5e';
+        return;
+      }
+      nameInput.style.borderColor = '#6366f1';
+
+      var valid = songCards.filter(function(c) {
+        return (c.title || '').trim() || (c.artist || '').trim();
+      });
+
+      if (valid.length === 0) {
+        alert('최소 1곡 이상의 제목과 가수를 입력해주세요!');
+        return;
+      }
+
+      var btn = document.getElementById('btnSubmitSongs');
+      btn.disabled = true;
+      btn.textContent = '🚀 노래 등록 중...';
+
+      var songsToSubmit = valid.map(function(c) {
+        return {
+          title: (c.title || '제목 미입력').trim(),
+          artist: (c.artist || '가수 미입력').trim(),
+          videoId: c.video ? c.video.videoId : '',
+          videoTitle: c.video ? c.video.title : '',
+          thumbnail: c.video ? c.video.thumbnail : '',
+          duration: c.video ? c.video.duration : ''
+        };
+      });
+
+      currentStudentName = studentName;
+
+      try {
+        var res = await fetch(API_BASE + '/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            room_code: currentRoomCode,
+            student_name: currentStudentName,
+            songs: songsToSubmit
+          })
+        });
+        var data = await res.json();
+        btn.disabled = false;
+        btn.textContent = '🚀 작성한 노래 모두 출제하기!';
+
+        if (data.success) {
+          showWaiting(songsToSubmit);
+        } else {
+          alert('제출에 실패했습니다. 방 코드를 확인해주세요.');
+        }
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = '🚀 작성한 노래 모두 출제하기!';
+        alert('네트워크 오류가 발생했습니다. 학교 Wi-Fi를 끄고 모바일 데이터(LTE)로 다시 시도해주세요.');
+      }
+    }
+
+    function showWaiting(songs) {
+      document.getElementById('sectionSubmit').style.display = 'none';
+      document.getElementById('sectionWaiting').style.display = 'block';
+      document.getElementById('displayStudentName').textContent = currentStudentName;
+
+      var listEl = document.getElementById('mySubmittedSongsList');
+      listEl.innerHTML = (songs || []).map(function(s, idx) {
+        return '<div style="display: flex; align-items: center; gap: 0.75rem; background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 10px; padding: 0.6rem 0.8rem;">' +
+          '<span style="font-weight: 800; color: #a5b4fc; font-size: 0.95rem;">#' + (idx + 1) + '</span>' +
+          (s.thumbnail ? '<img src="' + s.thumbnail + '" style="width: 50px; height: 38px; border-radius: 6px; object-fit: cover;">' : '') +
+          '<div style="flex: 1; min-width: 0;">' +
+            '<div style="font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + escapeHtml(s.title) + '</div>' +
+            '<div style="font-size: 0.8rem; color: #94a3b8;">' + escapeHtml(s.artist) + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function editSongs() {
+      document.getElementById('sectionWaiting').style.display = 'none';
+      document.getElementById('sectionSubmit').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+  </script>
+</body>
+</html>
